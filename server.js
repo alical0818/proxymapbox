@@ -25,6 +25,7 @@ app.get('/events', async (req, res) => {
 });
 
 app.get("/", (req, res) => {
+  console.log("Ping received at " + new Date().toISOString());
   res.send("OK");
 });
 
