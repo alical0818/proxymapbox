@@ -13,7 +13,7 @@ app.get('/events', async (req, res) => {
     return res.status(400).json({ error: 'Missing org_id' });
   }
   
-   let apiUrl = `https://api.mobilize.us/v1/organizations/${orgId}/events`;
+   let apiUrl = `https://api.mobilize.us/v1/organizations/${orgId}/events?per_page=100`;
   let allEvents = [];
 
   try {
@@ -36,6 +36,11 @@ app.get('/events', async (req, res) => {
     console.error('Error fetching Mobilize data:', err);
     res.status(500).json({ error: 'Failed to fetch events' });
   }
+});
+
+app.get("/", (req, res) => {
+  console.log("Ping received at " + new Date().toISOString());
+  res.send("OK");
 });
 
 const PORT = process.env.PORT || 3000;
