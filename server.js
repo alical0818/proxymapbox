@@ -12,21 +12,30 @@ app.get('/events', async (req, res) => {
   if (!orgId) {
     return res.status(400).json({ error: 'Missing org_id' });
   }
+  
+   let apiUrl = `https://api.mobilize.us/v1/organizations/${orgId}/events`;
+  let allEvents = [];
 
   try {
-    const apiUrl = `https://api.mobilize.us/v1/organizations/${orgId}/events`;
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    res.json(data); // send raw JSON to frontend
+    while (apiUrl) {
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (data && data.data) {
+        allEvents = allEvents.concat(data.data);
+      }
+
+      apiUrl = data.next || null; // next is null when there are no more pages
+    }
+
+    res.json(allEvents); // send all combined event data to frontend
   } catch (err) {
     console.error('Error fetching Mobilize data:', err);
     res.status(500).json({ error: 'Failed to fetch events' });
   }
-});
-
-app.get("/", (req, res) => {
-  console.log("Ping received at " + new Date().toISOString());
-  res.send("OK");
 });
 
 const PORT = process.env.PORT || 3000;
